@@ -12,4 +12,4 @@ COPY . .
 
 EXPOSE 80
 
-CMD ["node", "src/server.mjs"]
+CMD ["node", "src/server.js"]
