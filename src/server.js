@@ -1,6 +1,7 @@
 // console.log('hello')
 import http from "http";
-import WebSocket from "ws";
+// import WebSocket from "ws";
+import { WebSocket } from "ws"; // 중괄호 추가
 import express from "express";
 import path from "path";
 import { connect } from "http2";
