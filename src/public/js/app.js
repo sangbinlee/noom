@@ -1,4 +1,5 @@
-const socket = new WebSocket(`ws://${window.location.host}`);
+const protocol = window.location.protocol === "https:" ? "wss" : "ws";
+const socket = new WebSocket(`${protocol}://${window.location.host}`);
 
 const nicknameForm = document.querySelector("#nicknameForm");
 const messageForm = document.querySelector("#messageForm");
@@ -38,12 +39,7 @@ socket.addEventListener("close", () => {
 // custom function
 
 function messageEvent(event) {
-
-  // console.log(`from server data=${events}`)
-  // console.log(`from server data=`, events)
-  // console.log('from server data=', event)
   console.log( `■■■■■■■■■■■■■■■■ from server event.data=${event.data}`);
-
   
   const obj = JSON.parse(event.data);
   const li = document.createElement("li");
@@ -54,9 +50,6 @@ function messageEvent(event) {
     clientId = obj.clientId;
   }
  
-
-
-
   li.innerHTML = `(${obj.clientId}) : ${obj.msg}`;
   console.log(`■■■■■■■■■■■■■■■■ clientId=${clientId}`);
   list.appendChild(li);

@@ -1,5 +1,6 @@
 // console.log('hello')
 import http from "http";
+import https from "https";
 // import WebSocket from "ws";
 // import { WebSocket } from "ws"; // 중괄호 추가
 import { WebSocketServer } from "ws"; // WebSocket 대신 WebSocketServer 임포트
@@ -22,8 +23,13 @@ const server = http.createServer(app);
 const wss = new WebSocketServer({ server }); // new WebSocket.Server 대신 사용
 
 app.set("view engine", "pug");
-app.set("views", __dirname + "/views");
-app.use("/public", express.static(__dirname + "/public"));
+// app.set("views", __dirname + "/views");
+// app.use("/public", express.static(__dirname + "/public"));
+
+app.set("views", path.join(__dirname, "views")); 
+app.use("/public", express.static(path.join(__dirname, "public")));
+
+
 app.get("/", (req, res) => {
   res.render("home", { title: "Home Page", message: "Hello from Pug!" });
 });
