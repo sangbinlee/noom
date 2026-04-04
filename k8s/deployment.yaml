@@ -1,8 +1,8 @@
+---
 apiVersion: v1
 kind: Namespace
 metadata:
   name: chat
-
 ---
 # k8s/deployment.yaml
 apiVersion: apps/v1
@@ -21,7 +21,7 @@ spec:
         app: chat-server-app
     spec:
       containers:
-        - image: ghcr.io/sangbinlee/chat-server-app:latest
+        - image: ghcr.io/sangbinlee/chat-server-app:0fedb248915fd194fa5217389b0479576e8e3d34
           imagePullPolicy: Always
           name: chat-server-app
           ports:
