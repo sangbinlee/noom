@@ -4,8 +4,19 @@ import http from "http";
 // import { WebSocket } from "ws"; // 중괄호 추가
 import { WebSocketServer } from "ws"; // WebSocket 대신 WebSocketServer 임포트
 import express from "express";
-import path from "path";
+// import path from "path";
 import { connect } from "http2";
+
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+
+// 현재 파일의 URL을 파일 경로로 변환합니다.
+const __filename = fileURLToPath(import.meta.url);
+// 파일 경로에서 디렉토리 경로만 추출합니다.
+const __dirname = dirname(__filename);
+
+
+
 
 const PORT = 3000;
 const app = express();
