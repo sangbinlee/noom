@@ -1,0 +1,70 @@
+---
+# k8s/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: chat-server-app
+  namespace: chat
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: chat-server-app
+  template:
+    metadata:
+      labels:
+        app: chat-server-app
+    spec:
+      containers:
+        - image: ghcr.io/sangbinlee/chat-server-app:latest
+          imagePullPolicy: Always
+          name: chat-server-app
+          ports:
+            - containerPort: 80
+          resources:
+            limits:
+              cpu: 500m
+              memory: 256Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
+---
+# k8s/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: chat-server-app
+  namespace: chat
+spec:
+  ports:
+    - port: 80
+      targetPort: 80
+  selector:
+    app: chat-server-app
+  type: ClusterIP
+---
+# k8s/ingress.yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    kubernetes.io/ingress.class: nginx
+  name: chat-server-app-ingress
+  namespace: chat
+spec:
+  rules:
+    - host: chat.dev9.shop
+      http:
+        paths:
+          - backend:
+              service:
+                name: chat-server-app
+                port:
+                  number: 80
+            path: /
+            pathType: Prefix
+  tls:
+    - hosts:
+        - chat.dev9.shop
+      secretName: chat-server-app-tls
