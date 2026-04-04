@@ -1,0 +1,28 @@
+doctype html 
+html(lang="en")
+  head
+    meta(charset="UTF-8")
+    meta(http-equiv="X-UA-Compatible", content="IE=edge")
+    meta(name="viewport", content="width=device-width, initial-scale=1.0")
+    title Noom 
+    link(rel="stylesheet", href="/public/css/index.css")
+    // 파비콘 추가
+    link(rel="icon" type="image/png" href="/public/favicon/favicon-96x96.png")
+
+  body
+    //- h1 It works!
+    header 
+      h1 채팅 서버
+    main 
+      //- h2 Welcome to Noom!
+      form#nicknameForm(action="") 
+        span 별명
+        input(type="text" name="nickname" placeholder="choose a nickname..." required)
+        button(type="submit") Save
+      ul 
+      form#messageForm(action="") 
+        span(id="clientId")
+        input(type="text" name="message" placeholder="Type a message..." required)
+        button(type="submit") Send
+
+  script(src="/public/js/app.js")
