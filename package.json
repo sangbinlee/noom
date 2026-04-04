@@ -1,8 +1,9 @@
 {
-  "name": "noom",
+  "name": "chat-server-app",
   "version": "1.0.0",
+  "type": "module", 
   "description": "zoom clone using nodejs, webrtc and websockets.",
-  "main": "index.js",
+  "main": "src/server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon "
