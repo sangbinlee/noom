@@ -5,7 +5,7 @@ import https from "https";
 // import { WebSocket } from "ws"; // 중괄호 추가
 import { WebSocketServer } from "ws"; // WebSocket 대신 WebSocketServer 임포트
 import express from "express";
-// import path from "path";
+import path from "path";
 import { connect } from "http2";
 
 import { fileURLToPath } from "url";
