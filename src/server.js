@@ -7,16 +7,13 @@ import express from "express";
 // import path from "path";
 import { connect } from "http2";
 
-import { fileURLToPath } from 'url';
-import { dirname } from 'path';
+import { fileURLToPath } from "url";
+import { dirname } from "path";
 
 // 현재 파일의 URL을 파일 경로로 변환합니다.
 const __filename = fileURLToPath(import.meta.url);
 // 파일 경로에서 디렉토리 경로만 추출합니다.
 const __dirname = dirname(__filename);
-
-
-
 
 const PORT = 3000;
 const app = express();
@@ -53,10 +50,6 @@ wss.on("connection", (socket) => {
     console.log("2 ■■■■■■■ Client browser disconnected!", message);
 
     console.log(`■■■■ Client ${socket.id} disconnected!`);
-    
-    // 1. 나간 사용자의 정보를 담은 메시지 생성
-    const exitMsg = `채팅서버 : ${socket.id}번 손님이 퇴장하셨습니다.`;
-    const dataStr = makeJsonMessage("exit", exitMsg); // type을 "exit"으로 지정
 
     // 2. 관리 중인 배열에서 나간 소켓 제거 (필수)
     const index = sockets.indexOf(socket);
@@ -65,12 +58,12 @@ wss.on("connection", (socket) => {
     }
 
     // 3. 나머지 클라이언트들에게 퇴장 알림 전송
+    const exitMsg = `채팅서버 : ${socket.id}번 손님이 퇴장하셨습니다.`;
     sockets.forEach((s) => {
+      // 1. 나간 사용자의 정보를 담은 메시지 생성
+      const dataStr = makeJsonMessage("exit", exitMsg, '[server]]'); // type을 "exit"으로 지정
       s.send(dataStr);
     });
-
-
-
   });
 });
 
@@ -113,8 +106,6 @@ function messageEvent(socket, message) {
     // });
   }
 
-
-
   // socket.send(`■■■■■■■ Server received: ${message}`);
   // sockets.forEach((s) => {
   //   // console.log(`■■■■ send received msg to client browser . msg=${message}`)
@@ -127,22 +118,21 @@ function messageEvent(socket, message) {
 }
 
 function connectionEvent(socket) {
-  console.log("1 ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ conn .........  접속 connected to browser!");
+  console.log(
+    "1 ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ conn .........  접속 connected to browser!",
+  );
   clientId++;
   socket.id = clientId;
   sockets.push(socket);
   const welcomeMsg = `채팅서버 : 채팅방에 ${clientId} 손님이 접속 하셨습니다.welcome!`;
   console.log(`1 ■■■■■■■■■■■ 유저 접속 ${welcomeMsg}`);
-  const dataStr = makeJsonMessage("welcome", welcomeMsg, socket.id)
+  const dataStr = makeJsonMessage("welcome", welcomeMsg, socket.id);
 
   sockets.forEach((s) => {
     console.log(`1 ■■■■■■■■■■■ 유저 접속 dataStr=${dataStr}`);
     s.send(dataStr);
   });
 }
-
-
-
 
 const handleListen = () =>
   console.log(`server.js .... listening on http://localhost:${PORT}`);
