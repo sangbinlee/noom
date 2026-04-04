@@ -1,17 +1,18 @@
+---
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: chat-server
+  name: chat-server-app
   namespace: argocd
 spec:
+  destination:
+    namespace: chat
+    server: https://kubernetes.default.svc
   project: default
   source:
-    repoURL: 'https://github.com/<YOUR_GITHUB_USERNAME>/<REPO_NAME>.git'
-    targetRevision: main
     path: k8s
-  destination:
-    server: https://kubernetes.default.svc
-    namespace: chat
+    repoURL: https://github.com/sangbinlee/noom.git
+    targetRevision: main
   syncPolicy:
     automated:
       prune: true
