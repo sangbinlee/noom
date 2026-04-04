@@ -1,7 +1,8 @@
 // console.log('hello')
 import http from "http";
 // import WebSocket from "ws";
-import { WebSocket } from "ws"; // 중괄호 추가
+// import { WebSocket } from "ws"; // 중괄호 추가
+import { WebSocketServer } from "ws"; // WebSocket 대신 WebSocketServer 임포트
 import express from "express";
 import path from "path";
 import { connect } from "http2";
@@ -9,7 +10,8 @@ import { connect } from "http2";
 const PORT = 3000;
 const app = express();
 const server = http.createServer(app);
-const wss = new WebSocket.Server({ server });
+// const wss = new WebSocket.Server({ server });
+const wss = new WebSocketServer({ server }); // new WebSocket.Server 대신 사용
 
 app.set("view engine", "pug");
 app.set("views", __dirname + "/views");
