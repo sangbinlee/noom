@@ -14,7 +14,6 @@ socket.addEventListener("open", () => {
 });
 
 socket.addEventListener("message", (event) => {
-
   messageEvent(event);
 });
 
@@ -35,28 +34,48 @@ socket.addEventListener("close", () => {
 //   // socket.send(makeJsonMessage(type, message))
 // }, 100);
 
-
 // custom function
 
 function messageEvent(event) {
-  console.log( `■■■■■■■■■■■■■■■■ from server event.data=${event.data}`);
-  
+  console.log(`■■■■■■■■■■■■■■■■ from server event.data=${event.data}`);
+
   const obj = JSON.parse(event.data);
   const li = document.createElement("li");
-  // li.innerText = obj;  
+  // li.innerText = obj;
   // li.innerHTML=obj;
-  if (clientId === "") { 
+  if (clientId === "") {
     console.log(`■■■■■■■■■■■■■■■■ welcome clientId=${clientId}`);
     clientId = obj.clientId;
   }
- 
+
   li.innerHTML = `(${obj.clientId}) : ${obj.msg}`;
   console.log(`■■■■■■■■■■■■■■■■ clientId=${clientId}`);
   list.appendChild(li);
   clientIdSpan.innerHTML = `Client ID: ${clientId}`;
-
+  playNotificationSound();
 }
+const protocol2 = window.location.protocol
+console.log(`■■■■■■■■■■ protocol2=${protocol2} `);
+// const audio = new Audio(`${window.location.protocol}://${window.location.host}/public/sounds/ns_0_03.mp3`);
+const audio = new Audio(
+  `${protocol2}//${window.location.host}/public/sounds/ns_0_03.mp3`,
+);
+function playNotificationSound() {
+  // 중요: muted를 true로 하면 소리가 들리지 않습니다. 제거하세요.
+  audio.muted = false;
 
+  // 재생 위치를 처음으로 초기화 (연속 재생 대비)
+  audio.currentTime = 0;
+  // 또는 음소거 자동재생
+  // audio.muted = true;
+
+  audio.play().catch((error) => {
+    console.error(
+      "자동 재생이 차단되었습니다. 사용자의 상호작용이 필요합니다.",
+      error,
+    );
+  });
+}
 
 function makeJsonMessage(type, msg) {
   const data = { type: type, msg: msg, clientId: clientId };
@@ -83,6 +102,17 @@ function handleNickSubmit(event) {
   socket.send(makeJsonMessage(type, message)); // WebSocket을 통해 메시지 전송
   input.value = ""; // 입력 필드 초기화
 }
+
+// [핵심] 사용자가 페이지를 클릭하는 순간 브라우저의 오디오 락을 해제합니다.
+window.addEventListener(
+  "click",
+  () => {
+    // 빈 소리를 한 번 재생하여 권한을 획득하거나,
+    // 그냥 첫 클릭 이후부터 playNotificationSound()가 정상 작동하게 됩니다.
+    console.log("오디오 재생 권한 획득");
+  },
+  { once: true },
+);
 
 // 커스텀 이벤트 리스너 등록
 // 메시지 폼 제출 이벤트 리스너 등록
