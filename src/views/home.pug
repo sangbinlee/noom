@@ -14,15 +14,76 @@ html(lang="en")
     header 
       h1 채팅 서버
     main 
-      //- h2 Welcome to Noom!
-      form#nicknameForm(action="") 
-        span 별명
-        input(type="text" name="nickname" placeholder="choose a nickname..." required)
-        button(type="submit") Save
-      ul 
-      form#messageForm(action="") 
-        span(id="clientId")
-        input(type="text" name="message" placeholder="Type a message..." required)
-        button(type="submit") Send
 
-  script(src="/public/js/app.js")
+
+      div#welcome 
+        form(action="") 
+          span 방 이름
+          //- input(type="text" placeholder="choose a room name..." required autofocus)
+          input(type="text" placeholder="room name..." required )
+          button Enter Room
+        h4 open rooms (방 목록):
+        ul#roomList
+
+
+      
+      
+      div#call
+
+
+
+
+
+
+      video#myFace(autoplay , playsinline, width="400" height="300" ) 
+      button#mute Mute 
+      button#camera Turn Camera Off
+      select#cameraSelect(name="cameraSelect") 
+      
+
+
+
+
+
+
+
+
+
+
+      //- div#room(style="display: none;")
+      div#room(hidden)
+        h3
+        ul  
+        form#name(action="") 
+          //- span 방 이름
+          input(type="text" placeholder="nickname ..." required)
+          button Save 
+
+        form#msg(action="") 
+          //- span 방 이름
+          input(type="text" placeholder="msg ..." required)
+          button Send
+
+
+
+      div#websocket(style="display: none;")
+        //- h2 Welcome to Noom!
+        form#nicknameForm(action="") 
+          span 별명
+          input(type="text" name="nickname" placeholder="choose a nickname..." required)
+          button(type="submit") Save
+        ul 
+        form#messageForm(action="") 
+          span(id="clientId")
+          input(type="text" name="message" placeholder="Type a message..." required)
+          button(type="submit") Send
+
+
+
+
+
+
+
+  script(src="/socket.io/socket.io.js")
+  //- script(src="/public/js/app.js" )
+  script(src="/public/js/app.js" type="module")

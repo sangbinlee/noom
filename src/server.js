@@ -1,145 +1,168 @@
-// console.log('hello')
 import http from "http";
-import https from "https";
-// import WebSocket from "ws";
-// import { WebSocket } from "ws"; // 중괄호 추가
-import { WebSocketServer } from "ws"; // WebSocket 대신 WebSocketServer 임포트
 import express from "express";
-import path from "path";
-import { connect } from "http2";
-
-import { fileURLToPath } from "url";
-import { dirname } from "path";
-
-// 현재 파일의 URL을 파일 경로로 변환합니다.
-const __filename = fileURLToPath(import.meta.url);
-// 파일 경로에서 디렉토리 경로만 추출합니다.
-const __dirname = dirname(__filename);
-
-const PORT = 3000;
+import { configureApp } from "./set.js";
+import { initSocketServer } from "./socketHandler.js";
+const PORT = process.env.PORT || 3000;
 const app = express();
 const server = http.createServer(app);
-// const wss = new WebSocket.Server({ server });
-const wss = new WebSocketServer({ server }); // new WebSocket.Server 대신 사용
+import  {Server  } from 'socket.io'
+import  {instrument  } from '@socket.io/admin-ui'
 
-app.set("view engine", "pug");
-// app.set("views", __dirname + "/views");
-// app.use("/public", express.static(__dirname + "/public"));
+// Express 설정
+configureApp(app);
 
-app.set("views", path.join(__dirname, "views")); 
-app.use("/public", express.static(path.join(__dirname, "public")));
+// WebSocket 서버 초기화 (합쳐진 버전) 
+// initSocketServer(server);
 
-
-app.get("/", (req, res) => {
-  res.render("home", { title: "Home Page", message: "Hello from Pug!" });
+// socket.io  버전은 별도로 설정
+const wsServer = new Server(server, { 
+  cors: { 
+    origin: [
+      // "*",
+      "https://admin.socket.io"
+    ],
+    credentials: true
+  },
 });
 
-console.log("__dirname==============", __dirname);
-console.log("process.cwd()==============", process.cwd());
 
-const sockets = [];
-const msgs = [];
-let clientId = 0;
 
-wss.on("connection", (socket) => {
-  // 클라이언트 연결 감지
-  connectionEvent(socket);
-
-  // 클라이언트가 보낸 메지시 받기
-  socket.on("message", (message) => {
-    messageEvent(socket, message);
-  });
-
-  // 클라이언트 연결 종료 감지
-  socket.on("close", (message) => {
-    console.log("2 ■■■■■■■■■■■ close!");
-    console.log("2 ■■■■■■■ Client browser disconnected!", message);
-
-    console.log(`■■■■ Client ${socket.id} disconnected!`);
-
-    // 2. 관리 중인 배열에서 나간 소켓 제거 (필수)
-    const index = sockets.indexOf(socket);
-    if (index > -1) {
-      sockets.splice(index, 1);
-    }
-
-    // 3. 나머지 클라이언트들에게 퇴장 알림 전송
-    const exitMsg = `채팅서버 : ${socket.id}번 손님이 퇴장하셨습니다.`;
-    sockets.forEach((s) => {
-      // 1. 나간 사용자의 정보를 담은 메시지 생성
-      const dataStr = makeJsonMessage("exit", exitMsg, '[server]]'); // type을 "exit"으로 지정
-      s.send(dataStr);
-    });
-  });
+instrument(wsServer, {
+  // auth: {
+  //   type: "basic",
+  //   username: "admin",
+  //   password: "admin",
+  // }
+  auth: false
 });
 
-// custom function
-function makeJsonMessage(type, msg, clientId) {
-  const data = { type: type, msg: msg, clientId: clientId };
-  // const data = { type, msg, clientId };
-  return JSON.stringify(data);
-}
 
-function parseString(jsonString) {
-  return JSON.parse(jsonString);
-}
 
-function messageEvent(socket, message) {
-  const msg = parseString(message);
-  const type = msg.type;
-  console.log("");
-  console.log("2 ■■■■■■■■■■■ messageEvent!");
-  console.log("2 ■■■ Received message from client: message", `${message}`);
-  console.log("2 ■■■ Received message from client: msg", `${msg}`);
-  console.log("2 ■■■ Received message from client: msg.msg", `${msg.msg}`);
-  console.log("2 ■■■ Received message from client: type", `${type}`);
-  if (type === "message") {
-    msgs.push(msg.msg);
-    sockets.forEach((s) => {
-      console.log(`3 ■■■■■■■ Sending message to client: s=${s.id}`);
-      console.log(`3 ■■■■■■■ Sending message to client: s=${message}`);
-      console.log(`3 ■■■■■■■ Sending message to client: s=${msg.msg}`);
-      s.send(makeJsonMessage("server", msg.msg, socket.id));
-    });
 
-    // msgs.forEach((msg) => {
-    //   console.log(`2 ■■■■■■■■■■■ message=${msg}`);
-    //   console.log(
-    //     "3 ■■■■■■■ Sending message to client: s=",
-    //     makeJsonMessage("server", msg),
-    //   );
-    //   // socket.send(makeJsonMessage("server", msg));
-    // });
-  }
+// WebSocket 이벤트 처리
+wsServer.on("connection", (socket) => {
+  console.log("■ ■ ■ ■ ■ ■ ■ ■ Socket.IO ■ client ■ connected: ■ socket.id", socket.id);  
+  // console.log("■ ■ ■ ■ ■ ■ ■ ■ Socket.IO ■ client ■ connected: ■ socket", socket);  
 
-  // socket.send(`■■■■■■■ Server received: ${message}`);
-  // sockets.forEach((s) => {
-  //   // console.log(`■■■■ send received msg to client browser . msg=${message}`)
-  //   console.log(
-  //     "3 ■■■■■■■ Sending message to client: s=",
-  //     makeJsonMessage("welcome", s.id),
-  //   );
-  //   // s.send(makeJsonMessage("welcome", s.id));
-  // });
-}
+  socket['nickname'] = "Anonymous"; // 기본 닉네임 설정
 
-function connectionEvent(socket) {
-  console.log(
-    "1 ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ conn .........  접속 connected to browser!",
-  );
-  clientId++;
-  socket.id = clientId;
-  sockets.push(socket);
-  const welcomeMsg = `채팅서버 : 채팅방에 ${clientId} 손님이 접속 하셨습니다.welcome!`;
-  console.log(`1 ■■■■■■■■■■■ 유저 접속 ${welcomeMsg}`);
-  const dataStr = makeJsonMessage("welcome", welcomeMsg, socket.id);
+  socket.onAny((event) => {
+    console.log(`■ ■ ■ onAny ■ ■ ■ ■ ■ Socket.IO ■ server ■ event: ■ ${event}`);
+    console.log(`■ ■ ■ onAny ■ ■ ■ ■ ■ Socket.IO ■ server ■ wsServer.sockets.adapter: ■ ${wsServer.sockets.adapter}`);
+  }); 
 
-  sockets.forEach((s) => {
-    console.log(`1 ■■■■■■■■■■■ 유저 접속 dataStr=${dataStr}`);
-    s.send(dataStr);
+  // enter_room 이벤트 처리
+  socket.on("enter_room", (obj, callback) => {
+    
+    console.log(`■ ■ ■ ■ ■ ■ ■ ■ ■  ■ enter_room  ■ ■ ■ ■ ■ ■ ■ ■ 
+      ■ obj =${JSON.stringify(obj)}
+    , ■ socket.id = ${socket.id} 
+    , ■ rooms = ${JSON.stringify(socket.rooms)}`);
+
+    const roomName = obj.roomName;
+    console.log('■ ■ ■ ■ ■ ■ ■ ■ ■ roomName ■ ■ ■ ■ ■ ■ ■ ■ ■  ')
+    console.log(roomName)
+    console.log('■ ■ ■ ■ ■ ■ ■ ■ ■ id ■ ■ ■ ■ ■ ■ ■ ■ ■  ')
+    console.log(socket.id)
+    console.log('■ ■ ■ ■ ■ ■ ■ ■ ■ rooms ■ ■ ■ ■ ■ ■ ■ ■ ■  ')
+    console.log(socket.rooms)
+    console.log('■ ■ ■ ■ ■ ■ ■ ■ ■ join ■ ■ ■ ■ ■ ■ ■ ■ ■  ')
+    socket.join(roomName);
+    console.log('■ ■ ■ ■ ■ ■ ■ ■ ■ to ■ ■ ■ ■ ■ ■ ■ ■ ■  ')
+    socket.to(roomName).emit("welcome", socket.nickname, countRoom(roomName));
+
+
+    wsServer.sockets.emit("room_change", publicRooms());
+
+    console.log('■ ■ ■ ■ ■ ■ ■ ■ ■ rooms ■ ■ ■ ■ ■ ■ ■ ■ ■  ')
+    console.log(socket.rooms)
+    console.log('■ ■ ■ ■ ■ ■ ■ ■ ■ ')
+    
+    setTimeout(() => {
+      callback(); // 클라이언트에게 입장 완료 알림
+    }, 0  );
   });
+
+
+  socket.on("disconnecting", (nickname) => {  
+    console.log(`■ ■ ■ ■ ■ ■ ■ ■ ■  ■ disconnecting  ■ ■ ■ ■ ■ ■ ■ ■ 
+      ■ nickname = ${nickname}
+    , ■ socket.id = ${socket.id} 
+    , ■ rooms = ${JSON.stringify(socket.rooms)}`);
+    socket.rooms.forEach(room => {
+      socket.to(room).emit("bye", socket.nickname, countRoom(room) - 1); // 나가는 사람의 닉네임과 남은 인원 수 전달
+        console.log(`■ ■ ■ ■ ■ ■ ■ ■ ■  ■ disconnecting  ■ ■ ■ ■ ■ ■ ■ ■`)
+    });
+  });
+
+
+
+
+  
+  // disconnect 이벤트 처리
+  socket.on("disconnect", () => {
+    console.log(`■  disconnect ■ ■ ■ ■ ■ ■ ■ ■ ■  ■ ■ ■ ■ ■ ■  socket.id=${socket.id}`  );
+    wsServer.sockets.emit("room_change", publicRooms());
+  });
+ 
+
+
+  // 메시지 이벤트 처리
+  socket.on("new_message", (msg, roomName, callback) => {
+    console.log('■  new_message ■ ■ ■ ■ ■ ■ ■ ■ ■  ■ ■ ■ ■ ■ ■  msg=', msg );
+    console.log('■  new_message ■ ■ ■ ■ ■ ■ ■ ■ ■  ■ ■ ■ ■ ■ ■  roomName=', roomName );
+    socket.to(roomName).emit("new_message", `${socket.nickname}: ${msg  }`);
+
+    callback();
+  });
+
+  // nickname 이벤트 처리
+  socket.on("nickname", (nickname) => {
+    console.log('■  nickname ■ ■ ■ ■ ■ ■ ■ ■ ■  ■ ■ ■ ■ ■ ■  nickname='  , nickname);
+    socket['nickname'] = nickname;
+  });
+
+
+
+});
+
+
+
+server.listen(PORT, () => {
+  console.log(`1 ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ server.js .... listening on http://localhost:${PORT}`);
+});
+
+
+
+// public  
+
+function publicRooms() {
+  
+  // const  sids = wsServer.sockets.adapter.sids;
+  // const  rooms = wsServer.sockets.adapter.rooms; 
+
+  const { sids, rooms } = wsServer.sockets.adapter;
+
+
+
+  const publicRooms = [];
+  rooms.forEach((_, key) => {
+    console.log(`■ ■ ■ ■ ■ ■ ■ key=${key}`)
+    if (!sids[key]) {
+      publicRooms.push(key);
+    } 
+  });
+  return publicRooms;
 }
 
-const handleListen = () =>
-  console.log(`server.js .... listening on http://localhost:${PORT}`);
-server.listen(PORT, handleListen);
+function countRoom(roomName) {
+
+  console.log('roomName=',roomName)
+  const count = wsServer.sockets.adapter.rooms.get(roomName)?.size || 0;
+  console.log('■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ count=',count) 
+  return count;
+}
+
+
+
+
