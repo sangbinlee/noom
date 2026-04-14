@@ -19,40 +19,84 @@ let myStream; // 전역 변수로 myStream 선언
 let muted = false; // 음소거 상태를 추적하는 변수
 let cameraOff = false; // 카메라 상태를 추적하는 변수 
 
+let roomName = ""; // 현재 방 이름을 저장하는 변수
 
-function startMedia() {
-  
+let myPeerConnection; // RTCPeerConnection 객체를 저장하는 변수
+
+
+
+async function initCall() {
+  console.log(`■■■■■■■■■■■ initCall.......................`)
+  console.log(`■■■■■■■■■■■ initCall...welcome.hidden=true....................`)
+  console.log(`■■■■■■■■■■■ initCall...call.hidden=false....................`)
   welcome.hidden = true; // welcome 요소 숨김
-  call.hidden = false; // call 요소 표시
-  getMedia(); // 미디어 스트림 확보 및 카메라 목록 가져오기
+  call.hidden = false;
+  console.log(`■■■■■■■■■■■ initCall...await getMedia()....................`)
+  await getMedia(); // 미디어 스트림 확보 및 카메라 목록 가져오기
+  console.log(`■■■■■■■■■■■ initCall... // await getMedia()....................`)
+  console.log(`■■■■■■■■■■■ initCall...await makeConnection()....................`)
+  await makeConnection(); // RTCPeerConnection 생성 및 이벤트 등록
+  console.log(`■■■■■■■■■■■ initCall... // await makeConnection()....................`)
+  console.log(` // ■■■■■■■■■■■ initCall.......................`)
 
-  // navigator.mediaDevices.getUserMedia({ 
-  //   audio: true,    
-  //   video: { facingMode: "user" } 
-  // })
-  // .then(stream => {
-  //   myStream = stream; // myStream 변수에 스트림 할당
-  //   myFace.srcObject = stream;  
-  //   call.style.display = "block"; // call 요소 표시
-  //   getCameras(); // 카메라 목록 가져오기
-  // })
-  // .catch(error => {
-  //   console.error("Error accessing media devices.", error);
-  // }); 
 }
 
-// startMedia(); // 미디어 스트림 시작
+  
 
+
+
+// async function startMedia() {
+//   console.log(`startMedia.......................`)
+//   console.log(`startMedia.......................`)
+//   console.log(`startMedia.......................`)
+//   console.log(`startMedia.......................`)
+//   console.log(`startMedia.......................`)
+//   console.log(`startMedia.......................`)
+//   console.log(`startMedia.......................`)
+  
+//   welcome.hidden = true; // welcome 요소 숨김
+//   call.hidden = false; // call 요소 표시
+//   await getMedia(); // 미디어 스트림 확보 및 카메라 목록 가져오기
+//   makeConnection(); // RTCPeerConnection 생성 및 이벤트 등록
+ 
+// }
+
+async function makeConnection() {
+  console.log(`■■■■■■■■■■■ makeConnection.................`)
+
+  myPeerConnection = new RTCPeerConnection(); // RTCPeer    Connection 객체 생성
+  myPeerConnection.addEventListener("icecandidate", handleIce); // ICE 후보 이벤트 핸들러 등록
+  // myPeerConnection.addEventListener("addstream", handleAddStream); // 원격 스트림 추가 이벤트 핸들러 등록
+
+
+  console.log(`myStream.getTracks() = ${JSON.stringify(myStream.getTracks())}`)
+  myStream.getTracks().forEach(track => myPeerConnection.addTrack(track, myStream)); // 스트림의 모든 트랙을 RTCPeerConnection에 추가
+}
+
+function handleIce(data) {
+  console.log(`■■■■■■■■■■■■■ handleIce.......................`)
+  console.log(`■■■■■■■■■■■■■ data=${data}`)
+  
+}
 
 
 // 방 입장 이벤트 핸들러 
-function handleWelcomeSubmit(event) {
-  console.log('Enter Room ::: event=',event.target.textContent)
+async function handleWelcomeSubmit(event) {
+  console.log(`■■■■ handleWelcomeSubmit ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ `)
+  console.log(`■■■■ handleWelcomeSubmit ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ event=${event.target.textContent}`)
   event.preventDefault();
   const input = welcomeForm.querySelector("input");
+  console.log(`■■■■ handleWelcomeSubmit ■■■■ initCall() ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ `)
+  await initCall(); // 방 입장 전에 미디어 스트림 확보 및 RTCPeerConnection 생성
+  console.log(`■■■■ handleWelcomeSubmit ■■■■ // initCall() ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ `)
+
   roomName = input.value.trim();
+  console.log(`■■■■■■ [handleWelcomeSubmit] ::: roomName=${roomName}`)
   if (roomName) {
-    socket.emit("join_room", roomName, startMedia);
+    // socket.emit("join_room", roomName, startMedia);
+    socket.emit("join_room", roomName);
+  console.log(`■■■■ handleWelcomeSubmit ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ emit ■■ join_room ■■■ `)
+
     input.value = ""; // 입력 필드 초기화
   }
 }
@@ -87,22 +131,23 @@ async function getCameras() {
 }
 
 
-async function getMedia(devicedId) {
+async function getMedia(deviceId) {
+  console.log(`deviceId=====================${deviceId}`)
     // const initialConstraints = {
     //   audio: true,
     //   video: { facingMode: "user" }
     // };
     const cameraConstraints = {
       audio: true,
-      video: devicedId ? { deviceId: { exact: devicedId } } :  { facingMode: "user" }
+      video: deviceId ? { deviceId: { exact: deviceId } } :  { facingMode: "user" }
     };
-    console.log(`cameraConstraints=${cameraConstraints}`)
-    // const constraints = devicedId ? cameraConstraints : initialConstraints;
+    console.log(`cameraConstraints=JS${JSON.stringify(cameraConstraints) }`)
+    // const constraints = deviceId ? cameraConstraints : initialConstraints;
   try {
     myStream = await navigator.mediaDevices.getUserMedia(cameraConstraints);
     console.log(myStream)
     myFace.srcObject = myStream; // 비디오 요소에 스트림 연결
-    if (!devicedId) {
+    if (!deviceId) {
       await getCameras(); // 카메라 목록 가져오기
     }
   } catch (error) {
@@ -125,39 +170,8 @@ async function handleCameraChange() {
   const selectedCameraId = cameraSelect.value;
   console.log('handleCameraChange ::: selectedCameraId =', selectedCameraId); 
   await getMedia(selectedCameraId); // 선택된 카메라 ID로 미디어 스트림 업데이트
-
-
-  // const videoTrack = myStream.getVideoTracks()[0];
-  // // const constraints = {
-  // //   video: { deviceId: { exact: selectedCameraId } },
-  // //   audio: true
-  // // };
-
-  // const initialConstraints = {
-  //   audio: true,
-  //   video: { facingMode: "user" }
-  // };
-  // const cameraConstraints = {
-  //   audio: true,
-  //   video: { deviceId: { exact: selectedCameraId } }
-  // };
-  // const constraints = selectedCameraId ? cameraConstraints : initialConstraints;
-
-
-  // await navigator.mediaDevices.getUserMedia(constraints)
-  //   .then(newStream => {
-  //     const newVideoTrack = newStream.getVideoTracks()[0];
-  //     myStream.removeTrack(videoTrack);
-  //     myStream.addTrack(newVideoTrack);
-  //     myFace.srcObject = myStream; // 비디오 요소에 업데이트된 스트림 연결
-  //   })
-  //   .catch(error => {
-  //     console.error("Error occurred while changing camera.", error);
-  //   }); 
 }
 cameraSelect.addEventListener("input", handleCameraChange);
-
-
 
 
 function handleMuteClick() {
@@ -197,16 +211,53 @@ function handleCameraClick() {
 cameraButton.addEventListener("click", handleCameraClick);  
 
 
+// 방 입장 이벤트 처리
+socket.on("welcome", async () => {
+  
+    console.log(`■■ welcome ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■FROM SERVER ■■■■ EMIT ■■ welcome`)
+
+  // const offer = await myPeerConnection.createOffer();
+  // myPeerConnection.setLocalDescription(offer);
+  // console.log(`sent the offer to the server...offer=${ JSON.stringify(offer)}`)
+  // console.log(`sent the offer to the server...roomName=${roomName}`)
+  // console.log(`■■ welcome ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  ■■■■ EMIT ■■ offer roomName=${roomName}`)
+  // socket.emit("offer", offer, roomName);
+  // console.log(`// ■■ welcome ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■   ■■■■ EMIT ■■ offer`)
+});
+
+// socket.on("welcome", (userNickname, newCount) => {
+//   console.log("■ ■ ■ ■ 웰컴 to Socket.IO server with ID:", socket.id);
+//   console.log("■ ■ ■ ■ 웰컴 to Socket.IO server with ID:", socket.id);
+//   console.log("■ ■ ■ ■ 웰컴 to Socket.IO server with ID:", socket.id);
+//   console.log("■ ■ ■ ■ 웰컴 to Socket.IO server with ID:", socket.id);
+//   const h3 = room.querySelector("h3");
+//   h3.textContent = `Room: ${roomName} (${newCount})`; // 방 이름과 인원 수 업데이트
+
+//   addMessage(`■ ■ ■ ■ ${userNickname} arrived`); // 연결이 성공한 후에 이벤트 등록
+
+// });
 
 
+socket.on("offer", async (offer) => {
+  // console.log(`■ ■ ■ ■ offer from server Socket.IO   offer=${JSON.stringify(offer)}`)
+  console.log(`■ ■ ■ ■ offer from server Socket.IO   offer=${(offer)}`,offer)
+  myPeerConnection.setRemoteDescription(offer);
+  const answer = await myPeerConnection.createAnswer();
+  myPeerConnection.setLocalDescription(answer);
 
-socket.on("welcome", (userNickname, newCount) => {
-  console.log("■ ■ ■ ■ welcome to Socket.IO server with ID:", socket.id);
-  const h3 = room.querySelector("h3");
-  h3.textContent = `Room: ${roomName} (${newCount})`; // 방 이름과 인원 수 업데이트
+  
+  console.log(`emit ■ answer ■■■■■■■■■■■■■■■■■■■■■■■■■■■■`)
+  socket.emit("answer", answer, roomName);
+  // console.log(`■ ■ ■ ■ offer from server Socket.IO   answer=${JSON.stringify(answer)}`)
+  console.log(`■ ■ ■ ■ offer from server Socket.IO   answer=${(answer)}`,answer)
+  console.log(`■ ■ ■ ■ offer from server Socket.IO   roomName=${JSON.stringify(roomName)}`)
 
-  addMessage(`■ ■ ■ ■ ${userNickname} arrived`); // 연결이 성공한 후에 이벤트 등록
+});
 
+
+socket.on("answer", async (answer) => {
+  console.log(`■ ■ ■ ■ answer from server Socket.IO   answer=${JSON.stringify(answer)}`)
+  myPeerConnection.setRemoteDescription(answer);
 });
 
 
@@ -228,10 +279,8 @@ socket.on("new_message", (msg) => {
 
 socket.on("room_change", (rooms) => {
   console.log(`■ ■ ■ ■ room_change ■ ■ ■ ■ ■  rooms = ${JSON.stringify(rooms)}`);
-  console.log(`■ ■ ■ ■ room_change ■ ■ ■ ■ ■  rooms = `, rooms);
-  console.log("room_change to Socket.IO server with ID:", socket.id); 
-
-
+  console.log(`■ ■ ■ ■ room_change ■ ■ ■ ■ ■  rooms = rooms`);
+  console.log(`■ ■ ■ ■ room_change ■ ■ ■ ■ ■  socket.id = socket.id`);
 
   const roomList = document.getElementById("roomList");
   
@@ -268,7 +317,6 @@ const nickRoom = room.querySelector("#name");
 const msgRoom = room.querySelector("#msg");
 
 
-let roomName = ""; // 현재 방 이름을 저장하는 변수
 // room.hidden = true; // 초기에는 채팅방 숨김
 
 

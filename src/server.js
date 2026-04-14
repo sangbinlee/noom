@@ -41,8 +41,37 @@ instrument(wsServer, {
 
 // WebSocket 이벤트 처리
 wsServer.on("connection", (socket) => {
-  console.log("■ ■ ■ ■ ■ ■ ■ ■ Socket.IO ■ client ■ connected: ■ socket.id", socket.id);  
-  // console.log("■ ■ ■ ■ ■ ■ ■ ■ Socket.IO ■ client ■ connected: ■ socket", socket);  
+
+
+
+  console.log(`■???? ■ connection ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ `)
+  console.log(`■■ connection ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ `)
+  console.log(`■■ connection ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  Socket.IO ■ socket.id=${socket.id}`);  
+
+  socket.on("disconnecting", (nickname) => {  
+  console.log(`■ 1 ■ disconnecting ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ `)
+    console.log(`■ ■ ■ ■ ■ ■ ■ ■ ■  ■ disconnecting  ■ ■ ■ ■ ■ ■ ■ ■ 
+      ■ nickname = ${nickname}
+    , ■ socket.id = ${socket.id} 
+    , ■ rooms = ${JSON.stringify(socket.rooms)}`);
+    socket.rooms.forEach(room => {
+      socket.to(room).emit("bye", socket.nickname, countRoom(room) - 1); // 나가는 사람의 닉네임과 남은 인원 수 전달
+        console.log(`//■ ■ ■ ■ ■ ■ ■ ■ ■  ■ disconnecting  ■ ■ ■ ■ ■ ■ ■ ■`)
+    });
+  console.log(`//■ 1 ■ disconnecting ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ `)
+  });
+  
+  // disconnect 이벤트 처리
+  socket.on("disconnect", () => {
+    console.log(`■  disconnect ■■■■■■■■■■■■■■■■■■■■■  socket.id=${socket.id}`  );
+    wsServer.sockets.emit("room_change", publicRooms());
+    console.log(`■  disconnect ■■■■■■■■■■■■■■■■■ emit ■■ room_change ■■  publicRooms()=${publicRooms()}`  );
+    console.log(`//■  disconnect ■■■■■■■■■■■■■■■■■■■■■  socket.id=${socket.id}`  );
+  });
+ 
+
+
+
 
 
 
@@ -51,23 +80,40 @@ wsServer.on("connection", (socket) => {
 
 
   socket.onAny((event) => {
-    console.log(`■ ■ ■ onAny ■ ■ ■ ■ ■ Socket.IO ■ server ■ event: ■ ${event}`);
-    console.log(`■ ■ ■ onAny ■ ■ ■ ■ ■ Socket.IO ■ server ■ wsServer.sockets.adapter: ■ ${wsServer.sockets.adapter}`);
+    console.log(`■■ onAny ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ `)
+    console.log(`■■ onAny ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ event: ■ ${JSON.stringify(event)}`)
   }); 
 
-
-
-
-
-
-
-  socket.on("join_room", (roomName, done) => {
-    console.log(`■ ■ ■ ■ ■ ■ ■ ■ Socket.IO ■ client ■ join_room: ■ roomName=${roomName}  , socket.id=${socket.id}`);
+  socket.on("join_room", (roomName) => {
+    console.log(`■■ join_room ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ `)
+    console.log(`■■ join_room ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ roomName=${roomName}  , socket.id=${socket.id}`)
     socket.join(roomName);
-    done();
+    // done();
+    socket.to (roomName).emit("welcome");
+    console.log(`■■ join_room ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ EMIT ■■ welcome`)
     // socket.to(roomName).emit("welcome", socket.nickname, countRoom(roomName));
     // wsServer.sockets.emit("room_change", publicRooms());
   });
+
+
+  socket.on("offer", (offer, roomName) => {
+    console.log(`xxxxxxxxxxxxx offer =${offer}`)
+    console.log(`xxxxxxxxxxxxx offer =${(offer) }`, offer)
+    // console.log(`xxxxxxxxxxxxx offer =${JSON.stringify(offer) }`)
+
+    socket.to(roomName).emit("offer", offer);  
+  });
+
+
+
+  socket.on("answer", (answer, roomName) => {
+    console.log(`xx answer xxxxxxxxxxx roomName =${roomName}`)
+    console.log(`xx answer xxxxxxxxxxx answer =${(answer)}`)
+    // console.log(`xx answer xxxxxxxxxxx answer =${JSON.stringify(answer)}`)
+
+    socket.to(roomName).emit("answer", answer);
+  });
+
 
 
 
@@ -112,27 +158,6 @@ wsServer.on("connection", (socket) => {
   });
 
 
-  socket.on("disconnecting", (nickname) => {  
-    console.log(`■ ■ ■ ■ ■ ■ ■ ■ ■  ■ disconnecting  ■ ■ ■ ■ ■ ■ ■ ■ 
-      ■ nickname = ${nickname}
-    , ■ socket.id = ${socket.id} 
-    , ■ rooms = ${JSON.stringify(socket.rooms)}`);
-    socket.rooms.forEach(room => {
-      socket.to(room).emit("bye", socket.nickname, countRoom(room) - 1); // 나가는 사람의 닉네임과 남은 인원 수 전달
-        console.log(`■ ■ ■ ■ ■ ■ ■ ■ ■  ■ disconnecting  ■ ■ ■ ■ ■ ■ ■ ■`)
-    });
-  });
-
-
-
-
-  
-  // disconnect 이벤트 처리
-  socket.on("disconnect", () => {
-    console.log(`■  disconnect ■ ■ ■ ■ ■ ■ ■ ■ ■  ■ ■ ■ ■ ■ ■  socket.id=${socket.id}`  );
-    wsServer.sockets.emit("room_change", publicRooms());
-  });
- 
 
 
   // 메시지 이벤트 처리
@@ -166,20 +191,20 @@ server.listen(PORT, () => {
 
 function publicRooms() {
   
+  console.log(`■■ publicRooms ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ `)
+  console.log(`//■■ publicRooms ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ `)
   // const  sids = wsServer.sockets.adapter.sids;
   // const  rooms = wsServer.sockets.adapter.rooms; 
-
   const { sids, rooms } = wsServer.sockets.adapter;
-
-
-
   const publicRooms = [];
   rooms.forEach((_, key) => {
-    console.log(`■ ■ ■ ■ ■ ■ ■ key=${key}`)
+    console.log(`■■ publicRooms ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  key=${key}`)
     if (!sids[key]) {
       publicRooms.push(key);
     } 
   });
+
+  console.log(`//■■ publicRooms 1 ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ publicRooms=${publicRooms}`)
   return publicRooms;
 }
 
