@@ -10,12 +10,53 @@ const myFace = document.getElementById("myFace");
 const muteButton = document.getElementById("mute");
 const cameraButton = document.getElementById("camera");
 const cameraSelect = document.getElementById("cameraSelect");
+const call = document.getElementById("call");
 
 
+const welcome = document.getElementById("welcome");
+const welcomeForm = welcome.querySelector("form");
 let myStream; // 전역 변수로 myStream 선언
 let muted = false; // 음소거 상태를 추적하는 변수
 let cameraOff = false; // 카메라 상태를 추적하는 변수 
 
+
+function startMedia() {
+  
+  welcome.hidden = true; // welcome 요소 숨김
+  call.hidden = false; // call 요소 표시
+  getMedia(); // 미디어 스트림 확보 및 카메라 목록 가져오기
+
+  // navigator.mediaDevices.getUserMedia({ 
+  //   audio: true,    
+  //   video: { facingMode: "user" } 
+  // })
+  // .then(stream => {
+  //   myStream = stream; // myStream 변수에 스트림 할당
+  //   myFace.srcObject = stream;  
+  //   call.style.display = "block"; // call 요소 표시
+  //   getCameras(); // 카메라 목록 가져오기
+  // })
+  // .catch(error => {
+  //   console.error("Error accessing media devices.", error);
+  // }); 
+}
+
+// startMedia(); // 미디어 스트림 시작
+
+
+
+// 방 입장 이벤트 핸들러 
+function handleWelcomeSubmit(event) {
+  console.log('Enter Room ::: event=',event.target.textContent)
+  event.preventDefault();
+  const input = welcomeForm.querySelector("input");
+  roomName = input.value.trim();
+  if (roomName) {
+    socket.emit("join_room", roomName, startMedia);
+    input.value = ""; // 입력 필드 초기화
+  }
+}
+welcomeForm.addEventListener("submit", handleWelcomeSubmit);
 
 
 
@@ -70,7 +111,7 @@ async function getMedia(devicedId) {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  getMedia(); // 기본 카메라 스트림 확보 + 카메라 목록 채우기
+  // getMedia(); // 기본 카메라 스트림 확보 + 카메라 목록 채우기
 });
 
 
@@ -221,8 +262,6 @@ socket.on("room_change", (rooms) => {
 
 
 
-const welcome = document.getElementById("welcome");
-const welcomeForm = welcome.querySelector("form");
 const room = document.getElementById("room");
 
 const nickRoom = room.querySelector("#name");
@@ -284,7 +323,7 @@ function handleEnterRoomSubmit(event) {
     input.value = ""; // 입력 필드 초기화
   }
 }
-welcomeForm.addEventListener("submit", handleEnterRoomSubmit);
+// welcomeForm.addEventListener("submit", handleEnterRoomSubmit);
 
 
 

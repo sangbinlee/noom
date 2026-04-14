@@ -28,17 +28,12 @@ html(lang="en")
 
       
       
-      div#call
-
-
-
-
-
-
-      video#myFace(autoplay , playsinline, width="400" height="300" ) 
-      button#mute Mute 
-      button#camera Turn Camera Off
-      select#cameraSelect(name="cameraSelect") 
+      div#call(hidden)
+        div#myStream
+          video#myFace(autoplay , playsinline, width="400" height="300" ) 
+          button#mute Mute 
+          button#camera Turn Camera Off
+          select#cameraSelect(name="cameraSelect") 
       
 
 

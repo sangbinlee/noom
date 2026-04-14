@@ -44,12 +44,40 @@ wsServer.on("connection", (socket) => {
   console.log("■ ■ ■ ■ ■ ■ ■ ■ Socket.IO ■ client ■ connected: ■ socket.id", socket.id);  
   // console.log("■ ■ ■ ■ ■ ■ ■ ■ Socket.IO ■ client ■ connected: ■ socket", socket);  
 
-  socket['nickname'] = "Anonymous"; // 기본 닉네임 설정
+
+
+
+
+
 
   socket.onAny((event) => {
     console.log(`■ ■ ■ onAny ■ ■ ■ ■ ■ Socket.IO ■ server ■ event: ■ ${event}`);
     console.log(`■ ■ ■ onAny ■ ■ ■ ■ ■ Socket.IO ■ server ■ wsServer.sockets.adapter: ■ ${wsServer.sockets.adapter}`);
   }); 
+
+
+
+
+
+
+
+  socket.on("join_room", (roomName, done) => {
+    console.log(`■ ■ ■ ■ ■ ■ ■ ■ Socket.IO ■ client ■ join_room: ■ roomName=${roomName}  , socket.id=${socket.id}`);
+    socket.join(roomName);
+    done();
+    // socket.to(roomName).emit("welcome", socket.nickname, countRoom(roomName));
+    // wsServer.sockets.emit("room_change", publicRooms());
+  });
+
+
+
+
+
+
+
+
+  socket['nickname'] = "Anonymous"; // 기본 닉네임 설정
+
 
   // enter_room 이벤트 처리
   socket.on("enter_room", (obj, callback) => {
