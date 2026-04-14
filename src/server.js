@@ -19,11 +19,11 @@ const wsServer = new Server(server, {
   cors: { 
     origin: [
       "*",
-      "https://chat.dev9.shop",
-      "https://admin.socket.io",
+      // "https://chat.dev9.shop",
+      // "https://admin.socket.io",
     ],
-    methods: ["GET", "POST"],
-    credentials: true
+    // methods: ["GET", "POST"],
+    // credentials: true
   },
 });
 
@@ -65,10 +65,12 @@ wsServer.on("connection", (socket) => {
   
   // disconnect 이벤트 처리
   socket.on("disconnect", () => {
+  console.log(`■ 2 ■ disconnect ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ `)
     console.log(`■  disconnect ■■■■■■■■■■■■■■■■■■■■■  socket.id=${socket.id}`  );
     wsServer.sockets.emit("room_change", publicRooms());
     console.log(`■  disconnect ■■■■■■■■■■■■■■■■■ emit ■■ room_change ■■  publicRooms()=${publicRooms()}`  );
     console.log(`//■  disconnect ■■■■■■■■■■■■■■■■■■■■■  socket.id=${socket.id}`  );
+  console.log(`//■ 2 ■ disconnect ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ `)
   });
  
 
@@ -91,9 +93,10 @@ wsServer.on("connection", (socket) => {
     console.log(`■■ join_room ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ roomName=${roomName}  , socket.id=${socket.id}`)
     socket.join(roomName);
     // done();
-    socket.to (roomName).emit("welcome");
+
+    // socket.to(roomName).emit("welcome");
     console.log(`■■ join_room ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ EMIT ■■ welcome`)
-    // socket.to(roomName).emit("welcome", socket.nickname, countRoom(roomName));
+    socket.to(roomName).emit("welcome", socket.nickname, countRoom(roomName));
     // wsServer.sockets.emit("room_change", publicRooms());
   });
 

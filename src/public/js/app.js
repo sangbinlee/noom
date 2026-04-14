@@ -4,7 +4,7 @@ import "./domFocus.js";
 // registerSocketEvents();
 
 
-const socket = io(); // 기본 경로에서 Socket.IO 클라이언트 초기화
+const socket_IO = io(); // 기본 경로에서 Socket.IO 클라이언트 초기화
 
 const myFace = document.getElementById("myFace");
 const muteButton = document.getElementById("mute");
@@ -93,9 +93,10 @@ async function handleWelcomeSubmit(event) {
   roomName = input.value.trim();
   console.log(`■■■■■■ [handleWelcomeSubmit] ::: roomName=${roomName}`)
   if (roomName) {
-    // socket.emit("join_room", roomName, startMedia);
-    socket.emit("join_room", roomName);
+    // socket_IO.emit("join_room", roomName, startMedia);
+    socket_IO.emit("join_room", roomName);
   console.log(`■■■■ handleWelcomeSubmit ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ emit ■■ join_room ■■■ `)
+  console.log(`// ■■■■ handleWelcomeSubmit ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ emit ■■ join_room ■■■ `)
 
     input.value = ""; // 입력 필드 초기화
   }
@@ -212,24 +213,32 @@ cameraButton.addEventListener("click", handleCameraClick);
 
 
 // 방 입장 이벤트 처리
-socket.on("welcome", async () => {
+socket_IO.on("welcome", async (userNickname, newCount) => {
   
-    console.log(`■■ welcome ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■FROM SERVER ■■■■ EMIT ■■ welcome`)
+    console.log(`■■ welcome ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ xxxxxxxxxxxxxxxxx ■■■■ EMIT ■■ welcome`)
+    console.log(`■■ welcome ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ xxxxxxxxxxxxxxxxx ■■■■ EMIT ■■ welcome`)
+    console.log(`■■ welcome ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ xxxxxxxxxxxxxxxxx ■■■■ EMIT ■■ welcome`)
+    console.log(`■■ welcome ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ xxxxxxxxxxxxxxxxx ■■■■ EMIT ■■ welcome`)
+    console.log(`■■ welcome ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ xxxxxxxxxxxxxxxxx ■■■■ EMIT ■■ welcome`)
+    console.log(`■■ welcome ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ xxxxxxxxxxxxxxxxx ■■■■ EMIT ■■ welcome`)
+    console.log(`■■ welcome ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ xxxxxxxxxxxxxxxxx ■■■■ EMIT ■■ welcome`)
+    console.log(`■■ welcome ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ xxxxxxxxxxxxxxxxx ■■■■ EMIT ■■ welcome`)
+    console.log(`■■ welcome ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ xxxxxxxxxxxxxxxxx ■■■■ EMIT ■■ welcome`)
 
   // const offer = await myPeerConnection.createOffer();
   // myPeerConnection.setLocalDescription(offer);
   // console.log(`sent the offer to the server...offer=${ JSON.stringify(offer)}`)
   // console.log(`sent the offer to the server...roomName=${roomName}`)
   // console.log(`■■ welcome ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  ■■■■ EMIT ■■ offer roomName=${roomName}`)
-  // socket.emit("offer", offer, roomName);
+  // socket_IO.emit("offer", offer, roomName);
   // console.log(`// ■■ welcome ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■   ■■■■ EMIT ■■ offer`)
 });
 
-// socket.on("welcome", (userNickname, newCount) => {
-//   console.log("■ ■ ■ ■ 웰컴 to Socket.IO server with ID:", socket.id);
-//   console.log("■ ■ ■ ■ 웰컴 to Socket.IO server with ID:", socket.id);
-//   console.log("■ ■ ■ ■ 웰컴 to Socket.IO server with ID:", socket.id);
-//   console.log("■ ■ ■ ■ 웰컴 to Socket.IO server with ID:", socket.id);
+// socket_IO.on("welcome", (userNickname, newCount) => {
+//   console.log("■ ■ ■ ■ 웰컴 to Socket.IO server with ID:", socket_IO.id);
+//   console.log("■ ■ ■ ■ 웰컴 to Socket.IO server with ID:", socket_IO.id);
+//   console.log("■ ■ ■ ■ 웰컴 to Socket.IO server with ID:", socket_IO.id);
+//   console.log("■ ■ ■ ■ 웰컴 to Socket.IO server with ID:", socket_IO.id);
 //   const h3 = room.querySelector("h3");
 //   h3.textContent = `Room: ${roomName} (${newCount})`; // 방 이름과 인원 수 업데이트
 
@@ -238,7 +247,7 @@ socket.on("welcome", async () => {
 // });
 
 
-socket.on("offer", async (offer) => {
+socket_IO.on("offer", async (offer) => {
   // console.log(`■ ■ ■ ■ offer from server Socket.IO   offer=${JSON.stringify(offer)}`)
   console.log(`■ ■ ■ ■ offer from server Socket.IO   offer=${(offer)}`,offer)
   myPeerConnection.setRemoteDescription(offer);
@@ -247,7 +256,7 @@ socket.on("offer", async (offer) => {
 
   
   console.log(`emit ■ answer ■■■■■■■■■■■■■■■■■■■■■■■■■■■■`)
-  socket.emit("answer", answer, roomName);
+  socket_IO.emit("answer", answer, roomName);
   // console.log(`■ ■ ■ ■ offer from server Socket.IO   answer=${JSON.stringify(answer)}`)
   console.log(`■ ■ ■ ■ offer from server Socket.IO   answer=${(answer)}`,answer)
   console.log(`■ ■ ■ ■ offer from server Socket.IO   roomName=${JSON.stringify(roomName)}`)
@@ -255,32 +264,32 @@ socket.on("offer", async (offer) => {
 });
 
 
-socket.on("answer", async (answer) => {
+socket_IO.on("answer", async (answer) => {
   console.log(`■ ■ ■ ■ answer from server Socket.IO   answer=${JSON.stringify(answer)}`)
   myPeerConnection.setRemoteDescription(answer);
 });
 
 
-socket.on("bye", (userNickname, newCount) => {
+socket_IO.on("bye", (userNickname, newCount) => {
   console.log('■ ■ ■ ■ bye ■ ■ ■ ■ ■  userNickname =', userNickname)
-  console.log("■ ■ ■ ■ bye to Socket.IO server with ID:", socket.id);
+  console.log("■ ■ ■ ■ bye to Socket.IO server with ID:", socket_IO.id);
   const h3 = room.querySelector("h3");
   h3.textContent = `Room: ${roomName} (${newCount})`; // 방 이름과 인원 수 업데이트
   addMessage(`${userNickname} left`); // 연결이 성공한 후에 이벤트 등록
 });
 
 
-socket.on("new_message", (msg) => {
+socket_IO.on("new_message", (msg) => {
   console.log('■ ■ ■ ■ new_message ■ ■ ■ ■ ■ ')
-  console.log("new_message to Socket.IO server with ID:", socket.id);
+  console.log("new_message to Socket.IO server with ID:", socket_IO.id);
   addMessage(` ${msg}`); // 연결이 성공한 후에 이벤트 등록
 });
 
 
-socket.on("room_change", (rooms) => {
+socket_IO.on("room_change", (rooms) => {
   console.log(`■ ■ ■ ■ room_change ■ ■ ■ ■ ■  rooms = ${JSON.stringify(rooms)}`);
   console.log(`■ ■ ■ ■ room_change ■ ■ ■ ■ ■  rooms = rooms`);
-  console.log(`■ ■ ■ ■ room_change ■ ■ ■ ■ ■  socket.id = socket.id`);
+  console.log(`■ ■ ■ ■ room_change ■ ■ ■ ■ ■  socket_IO.id = socket_IO.id`);
 
   const roomList = document.getElementById("roomList");
   
@@ -298,11 +307,11 @@ socket.on("room_change", (rooms) => {
 
 });
 
-// socket.on("connect", () => {
-//   console.log("Connected to Socket.IO server with ID:", socket.id);
+// socket_IO.on("connect", () => {
+//   console.log("Connected to Socket.IO server with ID:", socket_IO.id);
 // });
 
-// socket.on("disconnect", () => {
+// socket_IO.on("disconnect", () => {
 //   console.log("Disconnected from Socket.IO server.");
 // });   
 
@@ -367,7 +376,7 @@ function handleEnterRoomSubmit(event) {
   const input = welcomeForm.querySelector("input");
   roomName = input.value.trim();
   if (roomName) {
-    socket.emit("enter_room", { roomName}, showRoom);
+    socket_IO.emit("enter_room", { roomName}, showRoom);
     input.value = ""; // 입력 필드 초기화
   }
 }
@@ -385,7 +394,7 @@ function handleNicknameSubmit(event) {
   const value = input.value.trim();
   if (value) {
     console.log('Enter nickname ::: value=',value)
-    socket.emit("nickname",value);
+    socket_IO.emit("nickname",value);
     input.value = ""; // 입력 필드 초기화
   }
 }
@@ -403,7 +412,7 @@ function handleMessageSubmit(event) {
   const value = input.value.trim();
   if (value) {
     console.log('Enter msg ::: value=',value)
-    socket.emit("new_message",value,  roomName, () =>{
+    socket_IO.emit("new_message",value,  roomName, () =>{
       addMessage(`You: ${value}`);
     });
     input.value = ""; // 입력 필드 초기화
