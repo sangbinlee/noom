@@ -4,7 +4,7 @@ import "./domFocus.js";
 // registerSocketEvents();
 
 
-const socket_IO = io(); // 기본 경로에서 Socket.IO 클라이언트 초기화
+const socket_IO = io("https://chat.dev9.shop", { transports: ["websocket"] }); // 기본 경로에서 Socket.IO 클라이언트 초기화
 
 const myFace = document.getElementById("myFace");
 const muteButton = document.getElementById("mute");

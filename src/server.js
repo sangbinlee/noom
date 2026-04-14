@@ -19,7 +19,7 @@ const wsServer = new Server(server, {
   cors: { 
     origin: [
       "*",
-      // "https://chat.dev9.shop",
+      "https://chat.dev9.shop",
       // "https://admin.socket.io",
     ],
     // methods: ["GET", "POST"],
