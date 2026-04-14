@@ -18,9 +18,10 @@ configureApp(app);
 const wsServer = new Server(server, { 
   cors: { 
     origin: [
-      // "*",
-      "https://admin.socket.io"
+      "*",
+      "https://admin.socket.io",
     ],
+    methods: ["GET", "POST"],
     credentials: true
   },
 });
