@@ -4,7 +4,7 @@ html(lang="en")
     meta(charset="UTF-8")
     meta(http-equiv="X-UA-Compatible", content="IE=edge")
     meta(name="viewport", content="width=device-width, initial-scale=1.0")
-    title Noom 
+    title Chat 
     link(rel="stylesheet", href="/public/css/index.css")
     // 파비콘 추가
     link(rel="icon" type="image/png" href="/public/favicon/favicon-96x96.png")
@@ -34,7 +34,7 @@ html(lang="en")
           button#mute Mute 
           button#camera Turn Camera Off
           select#cameraSelect(name="cameraSelect") 
-      
+          video#peerFace(autoplay , playsinline, width="400" height="300" )
 
 
 
@@ -62,7 +62,7 @@ html(lang="en")
 
 
       div#websocket(style="display: none;")
-        //- h2 Welcome to Noom!
+        //- h2 Welcome to Chat!
         form#nicknameForm(action="") 
           span 별명
           input(type="text" name="nickname" placeholder="choose a nickname..." required)

@@ -19,11 +19,11 @@ const wsServer = new Server(server, {
   cors: { 
     origin: [
       "*",
-      "https://chat.dev9.shop",
-      "https://admin.socket.io",
+      // "https://chat.dev9.shop",
+      // "https://admin.socket.io",
     ],
-    methods: ["GET", "POST"],
-    credentials: true
+    // methods: ["GET", "POST"],
+    // credentials: true
   },
 });
 
@@ -45,6 +45,8 @@ instrument(wsServer, {
 wsServer.on("connection", (socket) => {
 
 
+
+  socket['nickname'] = "Anonymous"; // 기본 닉네임 설정
 
   console.log(`■???? ■ connection ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ `)
   console.log(`■■ connection ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ `)
@@ -93,15 +95,14 @@ wsServer.on("connection", (socket) => {
     console.log(`■■ join_room ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ roomName=${roomName}  , socket.id=${socket.id}`)
     socket.join(roomName);
     // done();
-
-    // socket.to(roomName).emit("welcome");
-    console.log(`■■ join_room ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ EMIT ■■ welcome`)
-    socket.to(roomName).emit("welcome", socket.nickname, countRoom(roomName));
+    console.log(`■■ join_room ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ EMIT ■■ welcome2`)
+    socket.to(roomName).emit("welcome2", socket.nickname, countRoom(roomName));
     // wsServer.sockets.emit("room_change", publicRooms());
   });
 
 
   socket.on("offer", (offer, roomName) => {
+    console.log(`■■ offer ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ `)
     console.log(`xxxxxxxxxxxxx offer =${offer}`)
     console.log(`xxxxxxxxxxxxx offer =${(offer) }`, offer)
     // console.log(`xxxxxxxxxxxxx offer =${JSON.stringify(offer) }`)
@@ -112,6 +113,7 @@ wsServer.on("connection", (socket) => {
 
 
   socket.on("answer", (answer, roomName) => {
+    console.log(`■■ answer ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ `)
     console.log(`xx answer xxxxxxxxxxx roomName =${roomName}`)
     console.log(`xx answer xxxxxxxxxxx answer =${(answer)}`)
     // console.log(`xx answer xxxxxxxxxxx answer =${JSON.stringify(answer)}`)
@@ -120,14 +122,19 @@ wsServer.on("connection", (socket) => {
   });
 
 
+  socket.on("ice", (ice, roomName) => {
+    console.log(`■■ ice ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ `)
+    console.log(`xx ice xxxxxxxxxxx roomName =${roomName}`)
+    console.log(`xx ice xxxxxxxxxxx ice =${(ice)}`)
+    // console.log(`xx ice xxxxxxxxxxx ice =${JSON.stringify(ice)}`)  
+    socket.to(roomName).emit("ice", ice);
+  });
+  
 
 
 
 
 
-
-
-  socket['nickname'] = "Anonymous"; // 기본 닉네임 설정
 
 
   // enter_room 이벤트 처리
@@ -214,10 +221,9 @@ function publicRooms() {
 }
 
 function countRoom(roomName) {
-
-  console.log('roomName=',roomName)
+  console.log(`■■ countRoom ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ roomName=${roomName}`)
   const count = wsServer.sockets.adapter.rooms.get(roomName)?.size || 0;
-  console.log('■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ count=',count) 
+  console.log(`■■ countRoom ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ count=${count}`)
   return count;
 }
 

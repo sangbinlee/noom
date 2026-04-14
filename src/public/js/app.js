@@ -4,7 +4,9 @@ import "./domFocus.js";
 // registerSocketEvents();
 
 
-const socket_IO = io("https://chat.dev9.shop", { transports: ["websocket"] }); // 기본 경로에서 Socket.IO 클라이언트 초기화
+const socket_IO = io(
+  // "https://chat.dev9.shop", { transports: ["websocket"] }
+); // 기본 경로에서 Socket.IO 클라이언트 초기화
 
 const myFace = document.getElementById("myFace");
 const muteButton = document.getElementById("mute");
@@ -22,6 +24,40 @@ let cameraOff = false; // 카메라 상태를 추적하는 변수
 let roomName = ""; // 현재 방 이름을 저장하는 변수
 
 let myPeerConnection; // RTCPeerConnection 객체를 저장하는 변수
+
+
+
+
+
+
+// 방 입장 이벤트 처리
+socket_IO.on("welcome2", async (userNickname, newCount) => {
+  
+    console.log(`■■ welcome ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ xxxxxxxxxxxxxxxxx ■■■■ EMIT ■■ welcome`) 
+    const offer = await myPeerConnection.createOffer();
+    myPeerConnection.setLocalDescription(offer);
+    console.log(`■■ welcome ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ xxxxxxxxxxxxxxxxx ■■ EMIT ■■ offer ■■ offer=${JSON.stringify(offer)}`) 
+    socket_IO.emit("offer", offer, roomName);
+    console.log(`■■ welcome ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ EMIT ■■ offer ■■  roomName=${JSON.stringify(roomName)}`) 
+    console.log(`// ■■ welcome ■■■■■■■■■■■■■■■■■■■■■■ EMIT ■■ offer ■■ offer=${JSON.stringify(offer)}`) 
+    console.log(`// ■■ welcome ■■■■■■■■■■■■■■ EMIT ■■ offer ■■  roomName=${JSON.stringify(roomName)}`) 
+});
+
+
+
+socket_IO.on("ice", (ice) => {
+  console.log(`■■ ice from server Socket.IO ■■■■■■■■■■■■■■■■■■■■■■■■■■■■ ice=${JSON.stringify(ice)}`)
+  myPeerConnection.addIceCandidate(ice);
+});
+
+
+
+
+
+
+
+
+
 
 
 
@@ -64,18 +100,39 @@ async function initCall() {
 async function makeConnection() {
   console.log(`■■■■■■■■■■■ makeConnection.................`)
 
-  myPeerConnection = new RTCPeerConnection(); // RTCPeer    Connection 객체 생성
+  myPeerConnection = new RTCPeerConnection(
+    // {
+    //   iceServers: [
+    //     {
+    //       urls: [
+    //         "stun:stun.l.google.com:19302",
+    //         "stun:stun1.l.google.com:19302"
+    //       ]
+    //     }
+    //   ]
+    // }
+  ); // RTCPeer    Connection 객체 생성
   myPeerConnection.addEventListener("icecandidate", handleIce); // ICE 후보 이벤트 핸들러 등록
-  // myPeerConnection.addEventListener("addstream", handleAddStream); // 원격 스트림 추가 이벤트 핸들러 등록
-
+  myPeerConnection.addEventListener("addstream", handleAddStream); // 원격 스트림 추가 이벤트 핸들러 등록
 
   console.log(`myStream.getTracks() = ${JSON.stringify(myStream.getTracks())}`)
   myStream.getTracks().forEach(track => myPeerConnection.addTrack(track, myStream)); // 스트림의 모든 트랙을 RTCPeerConnection에 추가
 }
 
+
+function handleAddStream(data) {
+  console.log(`■■■■■■■■■■■ handleAddStream.......................`)
+  console.log(`■■■■■■■■■■■ data=${data}`)
+  const peerFace = document.getElementById("peerFace");
+  peerFace.srcObject = data.stream; // 원격 스트림을 비디오 요소에 연결
+}
+
+
+
 function handleIce(data) {
   console.log(`■■■■■■■■■■■■■ handleIce.......................`)
   console.log(`■■■■■■■■■■■■■ data=${data}`)
+  socket_IO.emit("ice", data.candidate, roomName); // ICE 후보를 Socket.IO 서버로 전송
   
 }
 
@@ -212,42 +269,10 @@ function handleCameraClick() {
 cameraButton.addEventListener("click", handleCameraClick);  
 
 
-// 방 입장 이벤트 처리
-socket_IO.on("welcome", async (userNickname, newCount) => {
-  
-    console.log(`■■ welcome ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ xxxxxxxxxxxxxxxxx ■■■■ EMIT ■■ welcome`)
-    console.log(`■■ welcome ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ xxxxxxxxxxxxxxxxx ■■■■ EMIT ■■ welcome`)
-    console.log(`■■ welcome ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ xxxxxxxxxxxxxxxxx ■■■■ EMIT ■■ welcome`)
-    console.log(`■■ welcome ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ xxxxxxxxxxxxxxxxx ■■■■ EMIT ■■ welcome`)
-    console.log(`■■ welcome ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ xxxxxxxxxxxxxxxxx ■■■■ EMIT ■■ welcome`)
-    console.log(`■■ welcome ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ xxxxxxxxxxxxxxxxx ■■■■ EMIT ■■ welcome`)
-    console.log(`■■ welcome ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ xxxxxxxxxxxxxxxxx ■■■■ EMIT ■■ welcome`)
-    console.log(`■■ welcome ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ xxxxxxxxxxxxxxxxx ■■■■ EMIT ■■ welcome`)
-    console.log(`■■ welcome ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ xxxxxxxxxxxxxxxxx ■■■■ EMIT ■■ welcome`)
-
-  // const offer = await myPeerConnection.createOffer();
-  // myPeerConnection.setLocalDescription(offer);
-  // console.log(`sent the offer to the server...offer=${ JSON.stringify(offer)}`)
-  // console.log(`sent the offer to the server...roomName=${roomName}`)
-  // console.log(`■■ welcome ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  ■■■■ EMIT ■■ offer roomName=${roomName}`)
-  // socket_IO.emit("offer", offer, roomName);
-  // console.log(`// ■■ welcome ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■   ■■■■ EMIT ■■ offer`)
-});
-
-// socket_IO.on("welcome", (userNickname, newCount) => {
-//   console.log("■ ■ ■ ■ 웰컴 to Socket.IO server with ID:", socket_IO.id);
-//   console.log("■ ■ ■ ■ 웰컴 to Socket.IO server with ID:", socket_IO.id);
-//   console.log("■ ■ ■ ■ 웰컴 to Socket.IO server with ID:", socket_IO.id);
-//   console.log("■ ■ ■ ■ 웰컴 to Socket.IO server with ID:", socket_IO.id);
-//   const h3 = room.querySelector("h3");
-//   h3.textContent = `Room: ${roomName} (${newCount})`; // 방 이름과 인원 수 업데이트
-
-//   addMessage(`■ ■ ■ ■ ${userNickname} arrived`); // 연결이 성공한 후에 이벤트 등록
-
-// });
 
 
 socket_IO.on("offer", async (offer) => {
+    console.log(`■■ offer ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ `)
   // console.log(`■ ■ ■ ■ offer from server Socket.IO   offer=${JSON.stringify(offer)}`)
   console.log(`■ ■ ■ ■ offer from server Socket.IO   offer=${(offer)}`,offer)
   myPeerConnection.setRemoteDescription(offer);
@@ -260,13 +285,16 @@ socket_IO.on("offer", async (offer) => {
   // console.log(`■ ■ ■ ■ offer from server Socket.IO   answer=${JSON.stringify(answer)}`)
   console.log(`■ ■ ■ ■ offer from server Socket.IO   answer=${(answer)}`,answer)
   console.log(`■ ■ ■ ■ offer from server Socket.IO   roomName=${JSON.stringify(roomName)}`)
+  console.log(`//■■ offer ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ `)
 
 });
 
 
 socket_IO.on("answer", async (answer) => {
+  console.log(`■■ answer ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ `)
   console.log(`■ ■ ■ ■ answer from server Socket.IO   answer=${JSON.stringify(answer)}`)
   myPeerConnection.setRemoteDescription(answer);
+  console.log(`//■■ answer ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ `)
 });
 
 
