@@ -101,16 +101,16 @@ async function makeConnection() {
   console.log(`■■■■■■■■■■■ makeConnection.................`)
 
   myPeerConnection = new RTCPeerConnection(
-    // {
-    //   iceServers: [
-    //     {
-    //       urls: [
-    //         "stun:stun.l.google.com:19302",
-    //         "stun:stun1.l.google.com:19302"
-    //       ]
-    //     }
-    //   ]
-    // }
+    {
+      iceServers: [
+        {
+          urls: [
+            "stun:stun.l.google.com:19302",
+            "stun:stun1.l.google.com:19302"
+          ]
+        }
+      ]
+    }
   ); // RTCPeer    Connection 객체 생성
   myPeerConnection.addEventListener("icecandidate", handleIce); // ICE 후보 이벤트 핸들러 등록
   myPeerConnection.addEventListener("addstream", handleAddStream); // 원격 스트림 추가 이벤트 핸들러 등록
