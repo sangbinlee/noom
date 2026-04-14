@@ -25,6 +25,7 @@ const wsServer = new Server(server, {
     // methods: ["GET", "POST"],
     // credentials: true
   },
+  transports: ["websocket"]
 });
 
 
@@ -129,7 +130,7 @@ wsServer.on("connection", (socket) => {
     // console.log(`xx ice xxxxxxxxxxx ice =${JSON.stringify(ice)}`)  
     socket.to(roomName).emit("ice", ice);
   });
-  
+
 
 
 
