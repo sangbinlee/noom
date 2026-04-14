@@ -21,7 +21,7 @@ spec:
         app: chat-server-app
     spec:
       containers:
-        - image: ghcr.io/sangbinlee/chat-server-app:37364e723616796cc5c7bef1e31ee9022c11414c
+        - image: ghcr.io/sangbinlee/chat-server-app:8c3d79ff498d01c96a074dda74f7913a4f402c35
           imagePullPolicy: Always
           name: chat-server-app
           ports:
