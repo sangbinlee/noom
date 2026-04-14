@@ -20,10 +20,10 @@ const wsServer = new Server(server, {
     origin: [
       "*",
       "https://chat.dev9.shop",
-      // "https://admin.socket.io",
+      "https://admin.socket.io",
     ],
-    // methods: ["GET", "POST"],
-    // credentials: true
+    methods: ["GET", "POST"],
+    credentials: true
   },
 });
 
