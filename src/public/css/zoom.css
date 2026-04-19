@@ -1,0 +1,32 @@
+video {
+  transition: transform 0.3s ease;
+  cursor: zoom-in;
+  position: relative;
+  z-index: 1;
+}
+
+video.fullscreen {
+  position: fixed;   /* 화면에 고정 */
+  top: 0;
+  left: 0;
+  width: 100vw;      /* 뷰포트 전체 너비 */
+  height: 100vh;     /* 뷰포트 전체 높이 */
+  object-fit: contain; /* 비율 유지하면서 꽉 채우기 */
+  z-index: 9999;     /* 맨 위로 */
+  cursor: zoom-out;
+}
+
+video::after {
+  content: "🔍";
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-size: 24px;
+  opacity: 0;
+  transition: opacity 0.2s;
+  pointer-events: none;
+}
+
+video:hover::after {
+  opacity: 1;
+}

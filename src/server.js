@@ -126,8 +126,8 @@ wsServer.on("connection", (socket) => {
   socket.on("ice", (ice, roomName) => {
     console.log(`■■ ice ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ `)
     console.log(`xx ice xxxxxxxxxxx roomName =${roomName}`)
-    console.log(`xx ice xxxxxxxxxxx ice =${(ice)}`)
-    // console.log(`xx ice xxxxxxxxxxx ice =${JSON.stringify(ice)}`)  
+    // console.log(`xx ice xxxxxxxxxxx ice =${(ice)}`)
+    console.log(`xx ice xxxxxxxxxxx ice =${JSON.stringify(ice)}`)  
     socket.to(roomName).emit("ice", ice);
   });
 
